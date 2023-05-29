@@ -190,7 +190,7 @@ const Mockup = () => {
                 <button draggable={false} onClick={(e)=>{
                     setMode("drawRoom")
                 }}>
-                    <img draggable={false} src="/svg/room.svg"/>
+                    <img draggable={false} src="./svg/room.svg"/>
                     Помещение
                 </button>
                 <button
@@ -204,7 +204,7 @@ const Mockup = () => {
                         objectType: "waterSource"
                     })
                 }}>
-                    <img draggable={false} src="/svg/water.svg"/>
+                    <img draggable={false} src="./svg/water.svg"/>
                     Источник Воды
                 </button>
                 <button
@@ -219,7 +219,7 @@ const Mockup = () => {
                     })
                 }}
                 >
-                    <img draggable={false} src="/svg/power.svg"/>
+                    <img draggable={false} src="./svg/power.svg"/>
                     Источник Электричества
                 </button>
             </div>

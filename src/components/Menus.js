@@ -45,7 +45,7 @@ const Menus = () => {
                  '/objects/'+filemap.entries[el].name+"/"+filemap.entries[el].entries[el2].name
                  );
               if (filemap.entries[el].entries[el2].isFile){
-                const image = '/objects/'+filemap.entries[el].name+"/"+filemap.entries[el].entries[el2].name;
+                const image = './objects/'+filemap.entries[el].name+"/"+filemap.entries[el].entries[el2].name;
                 return <LayerSubmenu onDoubleClick={(e)=>{
                   e.stopPropagation();
                   dispatch(addObject({
@@ -59,7 +59,7 @@ const Menus = () => {
               else {
                 const current = filemap.entries[el].entries[el2];
                 return Object.keys(current.entries).map((el3, key3)=>{
-                  const image = '/objects/'+
+                  const image = './objects/'+
                   filemap.entries[el].name+"/"+
                   filemap.entries[el].entries[el2].name+"/"+
                   filemap.entries[el].entries[el2].entries[el3].name;
