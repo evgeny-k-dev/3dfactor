@@ -1,0 +1,163 @@
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box; 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+} 
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+header{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #3658AE;
+}
+.MockupMain{
+  width: 100%;
+  position: relative;
+}
+.PersonalWrapper{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.PersonalWrapper p{
+  color: #FFF;
+  font-size: 20px;
+}
+.MainAppWrapper{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.MainAppWrapper>:first-child{
+  flex-grow: 1;
+}
+.MainAppWrapper>:last-child{
+  width: 30%;
+  flex-basis: 30%;
+}
+.MockupWrapper>*{
+  position: absolute;
+}
+.MockupWrapper{
+  position: relative;
+  display: flex;
+  background-color: #D9D9D9;
+  height: 100vh;
+}
+.MockupMain{
+  height: 100%;
+}
+.LowerButtons{
+  width: 100%;
+}
+.ToolbarWrapper{
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+.LayerSubMenu{
+  border-top: 3px solid #555555;
+  border-bottom: 3px solid #555555;
+}
+.LayerSubMenu.opened{
+  border-top: 3px solid #3793FF;
+  border-bottom: 3px solid #3793FF;
+}
+.LayerSubMenuContents{
+  padding: 10px 0;
+  height: 0px;
+  opacity: 0;
+}
+.LayerSubMenuContents.opened{
+  padding: 10px 0;
+  height: auto;
+  opacity: 1;
+}
+.LayerSubMenuPreview{
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 15px;
+}
+
+.LB_UpperButtonsWrap{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.LB_UpperButtonsWrap>*{
+ flex-basis: 50%;
+}
+.LB_UpperButtonsWrap>:first-child{
+  background-color: #2A8FEC;
+}
+.LB_UpperButtonsWrap>:last-child{
+  background-color: #30DC94;
+}
+.exportButton{
+  background-color: #9DA7FF;
+  width: 100%;
+}
+.LowerButtons button{
+  padding: 30px;
+  border: none;
+  outline: none;
+}
+.Modal3dWrapper{
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: click;
+  background-color: #0006;
+}
+.Modal3d{
+  padding: 30px;
+}
+.LayerSubMenuIcon{
+  width: 64px;
+  height: 64px;
+}
+.CategoriesWrap{
+  width: 100%;
+  display: flex;
+  justify-content: start;
+  gap: 5px;
+  padding-bottom: 15px;
+  overflow: auto;
+}
+.CategoriesWrap > button{
+  padding: 10px;
+  outline: none;
+  border: 1px solid #000;
+  background-color: #fff;
+}
+.CategoriesWrap > button.active{
+  padding: 10px;
+  outline: none;
+  border: none;
+  color: #FFF;
+  background-color: #110079;
+}
+.PlaceableObjects{
+  overflow: auto;
+  max-height: 45vh;
+}
