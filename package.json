@@ -1,7 +1,7 @@
 {
   "name": "3dfactor",
   "version": "0.1.0",
-  "homepage": "https://gitname.github.io/3dfactor/",
+  "homepage": "https://evgeny-k-dev.github.io/3dfactor/",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",
@@ -70,7 +70,7 @@
   },
   "scripts": {
     "predeploy": "node scripts/build.js",
-    "predeploy": "gh-pages -d build",
+    "deploy": "gh-pages -d build",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
