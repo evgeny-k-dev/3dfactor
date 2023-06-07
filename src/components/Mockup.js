@@ -1,11 +1,14 @@
 // @ts-nocheck
 
 import React, { useEffect, useRef, useState } from 'react'
-import { addObject, addRoom, changeObject, changeRoom, selectFloors, selectObjects, selectRooms } from '../redux/commonSlice';
+import { addObject, addRoom, changeObject, changeRoom, removeObject, removeRoom, selectFloors, selectObjects, selectRooms } from '../redux/commonSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { Stage, Layer, Rect, Text, Image } from 'react-konva';
+import { Stage, Layer, Rect, Text, Image, Transformer } from 'react-konva';
 import useImage from 'use-image';
 import {StlViewer} from "react-stl-viewer";
+import GridLayer from './konva/GridLayer';
+import Room from './konva/Room';
+import Object from './konva/Object';
 
 const Mockup = () => {
     const dispatch = useAppDispatch();
@@ -15,30 +18,37 @@ const Mockup = () => {
     const [info, setInfo] = useState({width: 0, height: 0})
     const ref = useRef({});
     const shown3d = true;
+    const [gridOffset, setGridOffset] = useState({ x: 0, y: 0 })
     const stageRef = useRef({});
+    const [activeRoom, setActiveRoom] = useState(-1)
+    const [activeObject, setActiveObject] = useState(-1)
     const [draggedObject, setDraggedObject] = useState({})
     const [mode, setMode] = useState("default")
+    const shapeRef = useRef({});
+    const transformerRef = useRef({});
+    const [roomUpdated, setRoomUpdated] = useState(false);
     useEffect(()=>{
         setInfo(ref.current?.getBoundingClientRect())
     },[ref])
   const [newAnnotation, setNewAnnotation] = useState([]);
-
   const handleMouseDown = event => {
     if (newAnnotation.length === 0 && mode==="drawRoom") {
       let { x, y } = event.target.getStage().getRelativePointerPosition();
-      // x= x / stage.scale;
-      // y= y / stage.scale;
+      console.log(x,y, "1st");
+      x= Math.round(x/100)*100;
+      y= Math.round(y/100)*100;
+      console.log(x,y, "2nd");
       setNewAnnotation([{ x, y, width: 0, height: 0, key: "0" }]);
     }
   };
 
   const handleMouseUp = event => {
     if (newAnnotation.length === 1 && mode==="drawRoom") {
-      const sx = newAnnotation[0].x;
-      const sy = newAnnotation[0].y;
+      const sx = Math.round(newAnnotation[0].x/100)*100;
+      const sy = Math.round(newAnnotation[0].y/100)*100;
       let { x, y } = event.target.getStage().getRelativePointerPosition();
-      // x= x / stage.scale;
-      // y= y / stage.scale;
+      x = Math.round(x/100)*100;
+      y = Math.round(y/100)*100;
       const annotationToAdd = {
         x: sx,
         y: sy,
@@ -53,11 +63,12 @@ const Mockup = () => {
 
   const handleMouseMove = event => {
     let { x, y } = event.target.getStage().getRelativePointerPosition();
-    // x= x / stage.scale;
-    // y= y / stage.scale;
+    x = Math.round(x/100)*100;
+    y = Math.round(y/100)*100;
     if (newAnnotation.length === 1 && mode==="drawRoom") {
-      const sx = newAnnotation[0].x;
-      const sy = newAnnotation[0].y;
+      const sx = Math.round(newAnnotation[0].x/100)*100;
+      const sy = Math.round(newAnnotation[0].y/100)*100;
+      console.log(x,y,sx,sy);
       setNewAnnotation([
         {
           x: sx,
@@ -94,39 +105,46 @@ const Mockup = () => {
     });
   };
   const annotationsToDraw = [...rooms, ...newAnnotation];
-    const URLImg = ({image})=>{
-      let [img] = useImage(image.src);
-        if (img?.width){
-          img.width=32;
-          img.height=32;
-          console.log("HERE", img, image.src);
-        }
-        return <Image
-        draggable
-        onDragEnd={(e)=>{
-          console.log("imgid", image.id);
-          stageRef.current.setPointersPositions(e.evt);
-          dispatch(changeObject({
-            ...image,
-            ...stageRef.current.getRelativePointerPosition(),
-          })) 
-          console.log(
-            e,
-            image,
-            stageRef.current.getRelativePointerPosition()
-          )
-        }}
-        image={img}
-        x={image.x}
-        y={image.y}
-        // I will use offset to set origin to the center of the image
-        offsetX={img ? img.width / 2 : 0}
-        offsetY={img ? img.height / 2 : 0}
-        />
-    }
+    // const URLImg = ({image})=>{
+    //   let [img] = useImage(image.src);
+    //     if (img?.width){
+    //       img.width=32;
+    //       img.height=32;
+    //     }
+    //     return <Image
+    //     draggable
+    //     onDragEnd={(e)=>{
+    //       stageRef.current.setPointersPositions(e.evt);
+    //       dispatch(changeObject({
+    //         ...image,
+    //         ...stageRef.current.getRelativePointerPosition(),
+    //       })) 
+    //       console.log(
+    //         e,
+    //         image,
+    //         stageRef.current.getRelativePointerPosition()
+    //       )
+    //     }}
+    //     image={img}
+    //     x={image.x}
+    //     y={image.y}
+    //     // I will use offset to set origin to the center of the image
+    //     offsetX={img ? img.width / 2 : 0}
+    //     offsetY={img ? img.height / 2 : 0}
+    //     />
+    // }
     return (
         <div style={mode=="drawRoom" ? {cursor: "crosshair"} : {}} className="MockupWrapper">
-            <div
+                <div
+                onClick={e=>e.target.focus()}
+                tabIndex={1}
+                onKeyUp={(e)=>{
+                  console.log(e.key, e);
+                  if (e.which==8 || e.which==46){
+                    dispatch(removeRoom(activeRoom))
+                    dispatch(removeObject(activeObject))
+                  }
+                }}
                 onDrop={(e)=>{
                 e.preventDefault();
                 if (mode=="default" && draggedObject){
@@ -134,7 +152,9 @@ const Mockup = () => {
                     if (draggedObject.id===100000000000000){
                     dispatch(addObject({
                         ...stageRef.current.getPointerPosition(),
-                        ...draggedObject
+                        ...draggedObject,
+                        width: 100,
+                        height: 100,
                     }))
                     }
                     else{
@@ -143,11 +163,6 @@ const Mockup = () => {
                             ...draggedObject
                         })) 
                     }
-                    console.log({
-                      ...stageRef.current.getPointerPosition(),
-                      ...draggedObject
-                    });
-                    console.log("done");
                     setDraggedObject({})
                 }
             }}
@@ -163,25 +178,72 @@ const Mockup = () => {
                 scaleY={stage.scale}
                 x={stage.x}
                 y={stage.y}
+                onDragEnd={(e)=>{
+                  setGridOffset(e.currentTarget.position());
+                }}
                  ref={stageRef} width={info.width} height={info.height} draggable={mode!=="drawRoom"}>
+                  <GridLayer onClick={(e)=>{
+                  setActiveRoom(-1)
+                  setActiveObject(-1)
+                }} scale={stage.scale} stagePos={gridOffset}/>
                     <Layer
                     draggable={false}>
-                        {annotationsToDraw.map((value)=>{
-                            return <Rect
-                            draggable={mode=="default"}
-                            x={value.x}
-                            y={value.y}
-                            width={value.width}
-                            height={value.height}
-                            fill={"#FFFFFF"}
-                            stroke="#000"
+                        {annotationsToDraw.map((value,key)=>{
+                          console.log(value);
+                            return <Room
+                            key={value.randid || key}
+                            onSelect={(e)=>{
+                              e.evt.preventDefault()
+                              setActiveRoom(value.id)
+                              if (activeObject){
+                                setActiveObject(-1)
+                              }
+                            }}
+                            onChange={(e)=>{
+                              console.log(e, "!!!!");
+                              dispatch(changeRoom(e))
+                            }}
+                            isSelected={activeRoom===value.id}
+                            shapeProps={{
+                            mode, 
+                            id: value.id,
+                            x: value.x,
+                            y: value.y,
+                            width: value.width,
+                            height: value.height,
+                            fill: "#FFFFFF",
+                            stroke: "#000"
+                            }}
                             />
                         })}
                     </Layer>
                     <Layer>
-                        {objects.map((e, key)=>{
-                        return e.x!==undefined ? <URLImg key={key} image={e}/> : ""
+                        {objects.map((value, key)=>{
+                        return value.x!==undefined ? <Object
+                        key={value.randid || key}
+                        shapeProps={value}
+                        onSelect={(e)=>{
+                          e.evt.preventDefault()
+                          setActiveObject(value.id)
+                          if (activeRoom){
+                            setActiveRoom(-1)
+                          }
+                        }}
+                        onChange={(e)=>{
+                          dispatch(changeObject(e))
+                        }}
+                        isSelected={activeObject===value.id}
+                        /> : ""
                     })}
+                    </Layer>
+                    <Layer>
+                      <Transformer ref={transformerRef} boundBoxFunc={(oldBox, newBox) => {
+            // limit resize
+            if (newBox.width < 10 || newBox.height < 10) {
+              return oldBox;
+            }
+            return newBox;
+          }}/>
                     </Layer>
                 </Stage>
                 
@@ -190,7 +252,7 @@ const Mockup = () => {
                 <button draggable={false} onClick={(e)=>{
                     setMode("drawRoom")
                 }}>
-                    <img draggable={false} src="./svg/room.svg"/>
+                    <img draggable={false} src="/3dfactor/svg/room.svg"/>
                     Помещение
                 </button>
                 <button
@@ -200,12 +262,12 @@ const Mockup = () => {
                     console.log("started");
                     setDraggedObject({
                         id: 100000000000000,
-                        src: "/svg/water.svg",
+                        src: "svg/water.svg",
                         objectType: "waterSource"
                     })
                 }}>
-                    <img draggable={false} src="./svg/water.svg"/>
-                    Источник Воды
+                    <img width="64" height="64" draggable={false} src="/3dfactor/svg/water.svg"/>
+                    Вода
                 </button>
                 <button
                 draggable={true}
@@ -214,13 +276,28 @@ const Mockup = () => {
                     console.log("started");
                     setDraggedObject({
                         id: 100000000000000,
-                        src: "/svg/power.svg",
+                        src: "svg/power.svg",
                         objectType: "powerSource"
                     })
                 }}
                 >
-                    <img draggable={false} src="./svg/power.svg"/>
-                    Источник Электричества
+                    <img width="64" height="64" draggable={false} src="/3dfactor/svg/power.svg"/>
+                    Электричество
+                </button>
+                <button
+                draggable={true}
+                onDragStart={(e)=>{
+                    setMode("default")
+                    console.log("started");
+                    setDraggedObject({
+                        id: 100000000000000,
+                        src: "svg/door.svg",
+                        objectType: "door"
+                    })
+                }}
+                >
+                    <img width="64" height="64" draggable={false} src="/3dfactor/svg/door.svg"/>
+                    Дверь
                 </button>
             </div>
         </div>

@@ -8,9 +8,9 @@ function App() {
   return (
     <div className="App">
       <header>
-        <img src="/svg/logo.svg" alt=""/>
+        <img src="svg/logo.svg" alt=""/>
         <div className="PersonalWrapper">
-          <img src="/svg/personals.svg" alt=""/>
+          <img src="svg/personals.svg" alt=""/>
           <p>Личный кабинет</p>
         </div>
       </header>

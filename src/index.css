@@ -70,6 +70,18 @@ header{
   justify-content: start;
   align-items: center;
 }
+.ToolbarWrapper>button{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px;
+  flex-shrink: 0;
+  width: 128px;
+}
+.ToolbarWrapper img{
+  margin-bottom: 10px;
+}
 .LayerSubMenu{
   border-top: 3px solid #555555;
   border-bottom: 3px solid #555555;

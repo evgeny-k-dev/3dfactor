@@ -12,7 +12,6 @@ const Menus = () => {
     const [activeCategory, setActiveCategory] = useState(0);
     const [activeSubCategory, setActiveSubCategory] = useState(0);
     const [objectsOpened, setObjectsOpened] = useState(false);
-    console.log(filemap.entries);
     let test = [];
   return (
     <div className="Menus">
@@ -32,7 +31,6 @@ const Menus = () => {
         </div>
         <div className='CategoriesWrap'>
           {Object.keys(filemap.entries).map((el,key)=>{
-            console.log(el);
             return <button onClick={()=>{setActiveCategory(key)}} className={activeCategory===key ? "active" : ""} key={key}>{filemap.entries[el].name}</button>
           })}
         </div>
@@ -40,12 +38,9 @@ const Menus = () => {
           {Object.keys(filemap.entries).map((el,key)=>{
             if (key===activeCategory){
             return Object.keys(filemap.entries[el].entries).map((el2,key2)=>{
-              console.log(key,
-                 filemap.entries[el].entries[el2].isFile,
-                 '/objects/'+filemap.entries[el].name+"/"+filemap.entries[el].entries[el2].name
-                 );
+              
               if (filemap.entries[el].entries[el2].isFile){
-                const image = './objects/'+filemap.entries[el].name+"/"+filemap.entries[el].entries[el2].name;
+                const image = '/3dfactor/objects/'+filemap.entries[el].name+"/"+filemap.entries[el].entries[el2].name;
                 return <LayerSubmenu onDoubleClick={(e)=>{
                   e.stopPropagation();
                   dispatch(addObject({
@@ -59,7 +54,7 @@ const Menus = () => {
               else {
                 const current = filemap.entries[el].entries[el2];
                 return Object.keys(current.entries).map((el3, key3)=>{
-                  const image = './objects/'+
+                  const image = '/3dfactor/objects/'+
                   filemap.entries[el].name+"/"+
                   filemap.entries[el].entries[el2].name+"/"+
                   filemap.entries[el].entries[el2].entries[el3].name;
@@ -68,6 +63,8 @@ const Menus = () => {
                     dispatch(addObject({
                       x: 0,
                       y: 0,
+                      width: 100,
+                      height: 100,
                       src: image,
                       objectType: current.entries[el3].base
                     }))

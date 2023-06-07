@@ -19,6 +19,7 @@ export const commonSlice = createSlice({
             state.rooms.push({...action.payload, id})
         },
         addObject: (state,action)=>{
+            console.log("added");
             const id = (state.objects.sort((a,b)=>b.id-a.id)[0]?.id+1)
             state.objects.push({...action.payload, id: id || 0})
         },

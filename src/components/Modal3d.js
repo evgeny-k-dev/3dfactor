@@ -28,7 +28,7 @@ const Modal3d = () => {
                       scale: 1.5,
                       rotationY: Math.PI
                     }}
-                    url={"/ceh.stl"}
+                    url={"/3dfactor/ceh.stl"}
                   /> 
             </div>
         </div>
