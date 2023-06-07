@@ -38,6 +38,7 @@ const Room = ({ shapeProps, isSelected, onSelect, onChange }) => {
             ~~(e.target.y()/100)*100)
         }}
         onTransformEnd={(e) => {
+          console.log(e);
           // transformer is changing scale of the node
           // and NOT its width or height
           // but in the store we have only width and height
@@ -50,21 +51,14 @@ const Room = ({ shapeProps, isSelected, onSelect, onChange }) => {
           node.scaleY(1);
           onChange({
             ...shapeProps,
-            randid: Math.random(),
+            rotation: node.rotation(),
+            randid: node.rotation() ? Math.random() : shapeProps.randid,
             x: Math.round(e.target.x() / 100)*100,
             y: Math.round(e.target.y() / 100)*100,
             // set minimal value
-            width: Math.max(100, Math.round(node.width() * scaleX / 100)*100),
-            height: Math.max(100, Math.round(node.height() * scaleY / 100) *100),
+            width: node.rotation() ? node.width() * scaleX : Math.max(100, Math.round(node.width() * scaleX / 100)*100),
+            height:node.rotation() ? node.height() * scaleY  :  Math.max(100, Math.round(node.height() * scaleY / 100) *100),
           });
-          console.log({
-            ...shapeProps,
-            x: Math.round(e.target.x()  / 100)*100,
-            y: Math.round(e.target.y()  / 100)*100,
-            // set minimal value
-            width: Math.max(100, Math.round(node.width() * scaleX / 100)*100),
-            height: Math.max(100, Math.round(node.height() * scaleY / 100) *100),
-          })
         }}
         {...shapeProps}
       />
@@ -78,8 +72,11 @@ const Room = ({ shapeProps, isSelected, onSelect, onChange }) => {
             // limit resize
             // newBox.x-=newBox.x%100;
             // newBox.y-=newBox.y%100;
-            if (newBox.width < 100 || newBox.height < 100) {
-              return oldBox;
+            console.log(newBox, oldBox);
+            if (!newBox.rotation){
+              if (newBox.width < 50 || newBox.height < 50) {
+                return oldBox;
+              }
             }
             return newBox;
           }}

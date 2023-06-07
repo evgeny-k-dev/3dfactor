@@ -144,6 +144,10 @@ const Mockup = () => {
                     dispatch(removeRoom(activeRoom))
                     dispatch(removeObject(activeObject))
                   }
+                  else if (e.key=="Escape"){
+                    setActiveRoom(-1)
+                    setActiveObject(-1)
+                  }
                 }}
                 onDrop={(e)=>{
                 e.preventDefault();
@@ -182,10 +186,7 @@ const Mockup = () => {
                   setGridOffset(e.currentTarget.position());
                 }}
                  ref={stageRef} width={info.width} height={info.height} draggable={mode!=="drawRoom"}>
-                  <GridLayer onClick={(e)=>{
-                  setActiveRoom(-1)
-                  setActiveObject(-1)
-                }} scale={stage.scale} stagePos={gridOffset}/>
+                  <GridLayer scale={stage.scale} stagePos={gridOffset}/>
                     <Layer
                     draggable={false}>
                         {annotationsToDraw.map((value,key)=>{

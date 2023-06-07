@@ -8,7 +8,7 @@ const Object = ({ shapeProps, isSelected, onSelect, onChange }) => {
   const dispatch = useAppDispatch();
   const shapeRef = React.useRef();
   const trRef = React.useRef();
-
+  console.log("rerender");
   React.useEffect(() => {
     if (isSelected) {
       // we need to attach transformer manually
@@ -29,7 +29,7 @@ const Object = ({ shapeProps, isSelected, onSelect, onChange }) => {
         onTap={onSelect}
         draggable
         onDragEnd={(e)=>{
-          console.log("event fired dragend");
+          if (shapeProps.objectType!=="door"){
           onChange({
             ...shapeProps,
             x: Math.round(e.target.x() / 100) * 100,
@@ -43,11 +43,17 @@ const Object = ({ shapeProps, isSelected, onSelect, onChange }) => {
               y: Math.round(e.target.y() / 100) * 100
             }
           )
+          }
+          else{
+            onChange({...shapeProps,
+            x: e.target.x(),
+            y: e.target.y(),
+          })
+          }
         }}
         image={img}
-        x={shapeProps.x}
-        y={shapeProps.y}
         onTransformEnd={(e) => {
+          console.log("transform");
           // transformer is changing scale of the node
           // and NOT its width or height
           // but in the store we have only width and height
@@ -58,24 +64,29 @@ const Object = ({ shapeProps, isSelected, onSelect, onChange }) => {
           // we will reset it back
           node.scaleX(1);
           node.scaleY(1);
-          onChange({
-            ...shapeProps,
-            randid: Math.random(),
-            x: Math.round(e.target.x() / 100)*100,
-            y: Math.round(e.target.y() / 100)*100,
-            // set minimal value
-            width: Math.max(100, Math.round(node.width() * scaleX / 100)*100),
-            height: Math.max(100, Math.round(node.height() * scaleY / 100) *100),
-          });
-          console.log({
-            ...shapeProps,
-            x: Math.round(e.target.x()  / 100)*100,
-            y: Math.round(e.target.y()  / 100)*100,
-            // set minimal value
-            width: Math.max(100, Math.round(node.width() * scaleX / 100)*100),
-            height: Math.max(100, Math.round(node.height() * scaleY / 100) *100),
+          if (shapeProps.type==="door" || Math.abs(node.rotation())){
+            onChange({...shapeProps, 
+            x: e.target.x(),
+            y: e.target.y(),
+            rotation: node.rotation(),
+            width: node.width() * scaleX,
+            height: node.height() * scaleY
           })
+          }
+          else{
+            onChange({
+              ...shapeProps,
+              rotation: node.rotation(),
+              // randid: Math.random(),
+              x: Math.round(e.target.x() / 100)*100,
+              y: Math.round(e.target.y() / 100)*100,
+              // set minimal value
+              width: Math.max(100, Math.round(node.width() * scaleX / 100)*100),
+              height: Math.max(100, Math.round(node.height() * scaleY / 100) *100),
+            });
+          }
         }}
+        {...shapeProps}
         // I will use offset to set origin to the center of the image
         // offsetX={img ? img.width / 2 : 0}
         // offsetY={img ? img.height / 2 : 0}
@@ -90,8 +101,10 @@ const Object = ({ shapeProps, isSelected, onSelect, onChange }) => {
             // limit resize
             // newBox.x-=newBox.x%100;
             // newBox.y-=newBox.y%100;
-            if (newBox.width < 100 || newBox.height < 100) {
-              return oldBox;
+            if (!newBox.rotation){
+              if (newBox.width < 100 || newBox.height < 100) {
+                return oldBox;
+              }
             }
             return newBox;
           }}
